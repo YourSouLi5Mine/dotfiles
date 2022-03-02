@@ -11,7 +11,7 @@ set expandtab
 set ignorecase
 set smartcase
 set termguicolors
-set wildmode=longest,list,full
+"set wildmode=longest,list,full
 set wildignore+=**/node_modules/*
 set wildignore+=**/.git/*
 
@@ -85,7 +85,7 @@ vnoremap <leader>d "_d
 nmap <C-p> :FZF<CR>
 
 nnoremap <leader>gd :YcmCompleter GoTo<CR>
-nnoremap <leader>gf :YcmCompleter FixIt<CR>
+nnoremap <leader>fi :YcmCompleter FixIt<CR>
 nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
 
 nnoremap <leader>er :call EmptyRegisters()<CR>
@@ -97,6 +97,7 @@ nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>ts :TestSuite<CR>
 nmap <silent> <leader>tl :TestLast<CR>
 nmap <silent> <leader>tg :TestVisit<CR>
+nmap <silent> <leader>ta :TestSuite<CR>
 
 nnoremap <leader>ag  :Grepper -tool ag -highlight<cr>
 nnoremap <leader>gg  :Grepper -tool git -highlight<cr>
