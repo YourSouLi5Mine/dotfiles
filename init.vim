@@ -1,4 +1,5 @@
 set title
+set hidden
 set number
 set relativenumber
 set colorcolumn=120
@@ -11,23 +12,28 @@ set expandtab
 set ignorecase
 set smartcase
 set termguicolors
-"set wildmode=longest,list,full
 set wildignore+=**/node_modules/*
 set wildignore+=**/.git/*
+set cmdheight=2
+set updatetime=300
+set shortmess+=c
 
-filetype plugin on
-set omnifunc=syntaxcomplete#Complete
+if has("nvim-0.5.0") || has("patch-8.1.1564")
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
 
 let g:polyglot_disabled = ['markdown']
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'sheerun/vim-polyglot'
+Plug 'posva/vim-vue'
 Plug 'vim-test/vim-test'
 Plug 'tpope/vim-dispatch'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'szw/vim-maximizer'
-Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'ycm-core/YouCompleteMe'
 Plug 'mhinz/vim-grepper'
 Plug 'ap/vim-css-color'
 Plug 'dracula/vim', { 'as': 'dracula' }
@@ -83,10 +89,6 @@ nnoremap <leader>d "_d
 vnoremap <leader>d "_d
 
 nmap <C-p> :FZF<CR>
-
-nnoremap <leader>gd :YcmCompleter GoTo<CR>
-nnoremap <leader>fi :YcmCompleter FixIt<CR>
-nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
 
 nnoremap <leader>er :call EmptyRegisters()<CR>
 
@@ -144,29 +146,6 @@ let g:undotree_HelpLine = 0
 
 let NERDTreeMinimalUI = 1
 
-let g:ale_linter_aliases = {
-\  'typescriptreact': 'typescript',
-\  'javascriptreact': 'javascript'
-\}
-
-let g:ale_linters = {
-\  'ruby': ['rubocop'],
-\  'javascript': ['eslint'],
-\  'typescript': ['eslint'],
-\}
-
-let g:ale_fixers = {
-\  '*': ['remove_trailing_lines', 'trim_whitespace'],
-\  'ruby': ['rubocop'],
-\  'javascript': ['prettier', 'eslint'],
-\  'typescript': ['eslint'],
-\  'javascriptreact': ['prettier', 'eslint'],
-\  'typescriptreact': ['eslint'],
-\  'css': ['prettier']
-\}
-
-let g:ale_linters_explicit = 1
-
 let test#strategy = "dispatch"
 
 let g:airline_theme = 'dracula'
@@ -203,6 +182,95 @@ function! AirlineInit()
 endfunction
 autocmd VimEnter * call AirlineInit()
 
-colorscheme dracula
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+
+nmap <leader>rn <Plug>(coc-rename)
+xmap <leader>cf  <Plug>(coc-format-selected)
+nmap <leader>cf  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+xmap <leader>ca  <Plug>(coc-codeaction-selected)
+nmap <leader>ca  <Plug>(coc-codeaction-selected)
+nmap <leader>cac  <Plug>(coc-codeaction)
+nmap <leader>cqf  <Plug>(coc-fix-current)
+nmap <leader>ccl  <Plug>(coc-codelens-action)
+
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
+
+nmap <silent> <C-s> <Plug>(coc-range-select)
+xmap <silent> <C-s> <Plug>(coc-range-select)
+
+command! -nargs=0 Format :call CocActionAsync('format')
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
+
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+nnoremap <silent><nowait> <space>ca  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait> <space>ce  :<C-u>CocList extensions<cr>
+nnoremap <silent><nowait> <space>cc  :<C-u>CocList commands<cr>
+nnoremap <silent><nowait> <space>co  :<C-u>CocList outline<cr>
+nnoremap <silent><nowait> <space>cs  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait> <space>cj  :<C-u>CocNext<CR>
+nnoremap <silent><nowait> <space>ck  :<C-u>CocPrev<CR>
+nnoremap <silent><nowait> <space>cp  :<C-u>CocListResume<CR>
 
 hi Normal guibg=NONE ctermbg=NONE
+
+colorscheme dracula
