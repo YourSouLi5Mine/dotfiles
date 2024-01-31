@@ -4,11 +4,13 @@ set number
 set relativenumber
 set colorcolumn=120
 set nocompatible
+
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set shiftround
 set expandtab
+
 set ignorecase
 set smartcase
 set termguicolors
@@ -28,10 +30,6 @@ let g:polyglot_disabled = ['markdown']
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'sheerun/vim-polyglot'
-Plug 'posva/vim-vue'
-Plug 'vim-test/vim-test'
-Plug 'tpope/vim-dispatch'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'szw/vim-maximizer'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'mhinz/vim-grepper'
@@ -40,14 +38,12 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 
 Plug 'mbbill/undotree'
 Plug 'preservim/nerdtree'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'ryanoasis/vim-devicons'
 Plug 'tpope/vim-surround'
 Plug 'mhinz/vim-startify'
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-fugitive'
 Plug 'preservim/nerdcommenter'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'mg979/vim-visual-multi'
@@ -94,24 +90,14 @@ nnoremap <leader>er :call EmptyRegisters()<CR>
 
 nmap <F3> :set hls!<CR>
 
-nmap <silent> <leader>tn :TestNearest<CR>
-nmap <silent> <leader>tf :TestFile<CR>
-nmap <silent> <leader>ts :TestSuite<CR>
-nmap <silent> <leader>tl :TestLast<CR>
-nmap <silent> <leader>tg :TestVisit<CR>
-nmap <silent> <leader>ta :TestSuite<CR>
-
 nnoremap <leader>ag  :Grepper -tool ag -highlight<cr>
 nnoremap <leader>gg  :Grepper -tool git -highlight<cr>
 nmap gs  <plug>(GrepperOperator)
 xmap gs  <plug>(GrepperOperator)
-nmap <leader>gh :diffget //3<CR>
-nmap <leader>gu :diffget //2<CR>
-nmap <leader>gi :G<CR>
+
+let g:qf_mapping_ack_style = 1
 
 nmap <silent> <leader>fc <ESC>/\v^[<=>]{7}( .*\|$)<CR>
-
-imap jj <Esc>
 
 nmap <leader>xc :let @+ = expand("%")<CR>
 
@@ -146,8 +132,6 @@ let g:undotree_HelpLine = 0
 
 let NERDTreeMinimalUI = 1
 
-let test#strategy = "dispatch"
-
 let g:airline_theme = 'dracula'
 let g:airline_powerline_fonts = 1
 let g:tmuxline_preset = {
@@ -181,95 +165,6 @@ function! AirlineInit()
   let g:airline_section_b = airline#section#create_left(['', 'hunks'])
 endfunction
 autocmd VimEnter * call AirlineInit()
-
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-if has('nvim')
-  inoremap <silent><expr> <c-space> coc#refresh()
-else
-  inoremap <silent><expr> <c-@> coc#refresh()
-endif
-
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . " " . expand('<cword>')
-  endif
-endfunction
-
-nmap <leader>rn <Plug>(coc-rename)
-xmap <leader>cf  <Plug>(coc-format-selected)
-nmap <leader>cf  <Plug>(coc-format-selected)
-
-augroup mygroup
-  autocmd!
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-xmap <leader>ca  <Plug>(coc-codeaction-selected)
-nmap <leader>ca  <Plug>(coc-codeaction-selected)
-nmap <leader>cac  <Plug>(coc-codeaction)
-nmap <leader>cqf  <Plug>(coc-fix-current)
-nmap <leader>ccl  <Plug>(coc-codelens-action)
-
-xmap if <Plug>(coc-funcobj-i)
-omap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap af <Plug>(coc-funcobj-a)
-xmap ic <Plug>(coc-classobj-i)
-omap ic <Plug>(coc-classobj-i)
-xmap ac <Plug>(coc-classobj-a)
-omap ac <Plug>(coc-classobj-a)
-
-if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-endif
-
-nmap <silent> <C-s> <Plug>(coc-range-select)
-xmap <silent> <C-s> <Plug>(coc-range-select)
-
-command! -nargs=0 Format :call CocActionAsync('format')
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
-
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-nnoremap <silent><nowait> <space>ca  :<C-u>CocList diagnostics<cr>
-nnoremap <silent><nowait> <space>ce  :<C-u>CocList extensions<cr>
-nnoremap <silent><nowait> <space>cc  :<C-u>CocList commands<cr>
-nnoremap <silent><nowait> <space>co  :<C-u>CocList outline<cr>
-nnoremap <silent><nowait> <space>cs  :<C-u>CocList -I symbols<cr>
-nnoremap <silent><nowait> <space>cj  :<C-u>CocNext<CR>
-nnoremap <silent><nowait> <space>ck  :<C-u>CocPrev<CR>
-nnoremap <silent><nowait> <space>cp  :<C-u>CocListResume<CR>
 
 hi Normal guibg=NONE ctermbg=NONE
 

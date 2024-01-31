@@ -21,7 +21,6 @@ plugins=(
   vi-mode
   zsh-autosuggestions
   zsh-syntax-highlighting
-  tmux
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -38,7 +37,7 @@ alias gb='git branch'
 alias gbD='git branch -D'
 alias gba='git branch -a'
 alias gbd='git branch -d'
-alias gbdm="git branch --merged | egrep -v \"(^\*|main|staging|production)\" | xargs git branch -d"
+alias gbdm="git branch --merged | egrep -v \"(^\*|develop|master)\" | xargs git branch -d"
 alias gbr='git branch -r'
 alias gc!='git commit -v --amend'
 alias gc='git commit -v -m'
@@ -107,33 +106,14 @@ alias cr='npx cypress run'
 alias co='npx cypress open'
 alias gz='git archive --format=zip --output now-insurance-api.zip HEAD'
 
-eval "$(rbenv init -)"
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-autoload -U add-zsh-hook
-load-nvmrc() {
-  local node_version="$(nvm version)"
-  local nvmrc_path="$(nvm_find_nvmrc)"
-
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-      nvm use
-    fi
-  elif [ "$node_version" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
-
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
+
+export PATH="/usr/local/bin:$PATH"
