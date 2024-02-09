@@ -32,6 +32,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'sheerun/vim-polyglot'
 Plug 'szw/vim-maximizer'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'romainl/vim-qf'
 Plug 'mhinz/vim-grepper'
 Plug 'ap/vim-css-color'
 Plug 'dracula/vim', { 'as': 'dracula' }
@@ -134,6 +135,8 @@ let NERDTreeMinimalUI = 1
 
 let g:airline_theme = 'dracula'
 let g:airline_powerline_fonts = 1
+let g:airline_section_y = ""
+let g:airline_section_z = ""
 let g:tmuxline_preset = {
 \  'a'   : '[#S]',
 \  'win' : '#I  #W#F',
@@ -157,14 +160,8 @@ let g:VM_maps["Add Cursor Up"]     = '<C-k>'
 let g:startify_bookmarks = [
 \  { 'v': '~/.config/nvim/init.vim' },
 \  { 'z': '~/.zshrc' },
-\  { 't': '~/.tmux.conf' },
-\  { 'i': '~/.gitignore' },
+\  { 't': '~/.tmux.conf' }
 \]
-
-function! AirlineInit()
-  let g:airline_section_b = airline#section#create_left(['', 'hunks'])
-endfunction
-autocmd VimEnter * call AirlineInit()
 
 hi Normal guibg=NONE ctermbg=NONE
 
